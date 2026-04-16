@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bisnisaja — Atur Laporan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── DESIGN SYSTEMAJA TOKENS ── */
+    :root {
+      /* Brand — Primary/Magenta */
+      --primary:          #E91E8C;
+      --primary-hover:    #C9197A;
+      --primary-light:    rgba(233, 30, 140, 0.08);
+      --primary-lighter:  rgba(233, 30, 140, 0.05);
+      --primary-border:   rgba(233, 30, 140, 0.25);
+
+      /* Sidebar (white/light — Design Systemaja style) */
+      --sidebar-bg:       #FFFFFF;
+      --sidebar-border:   #F0F0F0;
+      --sidebar-text:     #6B7280;
+      --sidebar-hover:    #F9FAFB;
+      --sidebar-active-bg: var(--primary-lighter);
+      --sidebar-active-text: var(--primary);
+      --sidebar-width:    220px;
+
+      /* Page background */
+      --bg:               #F5F6F8;
+      --surface:          #FFFFFF;
+      --border:           #E5E7EB;
+      --border-light:     #F3F4F6;
+
+      /* Text */
+      --text-1:           #111827;
+      --text-2:           #4B5563;
+      --text-3:           #9CA3AF;
+
+      /* Checkbox custom */
+      --cb-checked:       var(--primary);
+      --cb-border:        #D1D5DB;
+
+      /* Shadows */
+      --shadow-sm:        0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-panel:     0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    /* ══════════════════════════════
+       SIDEBAR
+    ══════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-logo {
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid var(--sidebar-border);
+      display: flex;
+      align-items: center;
+    }
+    .logo-img {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .logo-icon-wrap {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon-wrap svg { width: 26px; height: 26px; }
+    .logo-wordmark {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.4px;
+    }
+    .logo-wordmark span { color: var(--text-1); }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      color: var(--sidebar-text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      text-decoration: none;
+      position: relative;
+      white-space: nowrap;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--text-1); }
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 3px;
+      background: var(--primary);
+      border-radius: 0 3px 3px 0;
+    }
+    .nav-icon {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-item:hover .nav-icon { opacity: 1; }
+
+    .nav-sep {
+      height: 1px;
+      background: var(--border-light);
+      margin: 6px 16px;
+    }
+
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--sidebar-border);
+    }
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .user-card:hover { background: var(--sidebar-hover); }
+    .user-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-email {
+      font-size: 11px;
+      color: var(--text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-chevron { color: var(--text-3); flex-shrink: 0; }
+
+    /* ══════════════════════════════
+       MAIN AREA
+    ══════════════════════════════ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Page Header Bar ── */
+    .page-topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.3px;
+    }
+
+    /* ── Three-column Content ── */
+    .content-area {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      gap: 0;
+      padding: 20px 24px;
+      gap: 16px;
+    }
+
+    /* ══════════════════════════════
+       LEFT PANEL — Template List
+    ══════════════════════════════ */
+    .panel-templates {
+      width: 220px;
+      min-width: 220px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-panel);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-templates-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .panel-templates-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+    .panel-templates-desc {
+      font-size: 11.5px;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+
+    .template-list {
+      padding: 8px 10px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .template-list::-webkit-scrollbar { width: 4px; }
+    .template-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .template-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      gap: 8px;
+    }
+    .template-item:hover { background: var(--bg); }
+    .template-item.active {
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+    }
+    .template-item-name {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-1);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .template-item.active .template-item-name { color: var(--primary); }
+    .template-item-menu {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--text-3);
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+    .template-item-menu:hover { background: var(--border-light); color: var(--text-2); }
+
+    .panel-templates-footer {
+      padding: 10px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-add-template {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--primary);
+      border-radius: 8px;
+      color: var(--primary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      background: transparent;
+      width: 100%;
+    }
+    .btn-add-template:hover { background: var(--primary-light); }
+
+    .btn-download-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      justify-content: center;
+      transition: opacity 0.12s;
+    }
+    .btn-download-link:hover { opacity: 0.75; }
+    .btn-download-link svg { width: 13px; height: 13px; }
+
+    /* ══════════════════════════════
+       CENTER PANEL — Column Selector
+    ══════════════════════════════ */
+    .panel-columns {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-panel);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .panel-columns-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .panel-columns-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .panel-columns-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .btn-edit-template {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: background 0.12s;
+      background: transparent;
+      border: none;
+      flex-shrink: 0;
+    }
+    .btn-edit-template:hover { background: var(--primary-light); }
+    .panel-columns-desc {
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+
+    .columns-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 20px 20px;
+    }
+    .columns-scroll::-webkit-scrollbar { width: 4px; }
+    .columns-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Data Laporan label */
+    .data-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-section {
+      margin-bottom: 18px;
+    }
+    .checkbox-section-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 0 8px;
+      border-top: 1px solid var(--border-light);
+      margin-bottom: 4px;
+    }
+    .checkbox-section:first-of-type .checkbox-section-label {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 12px;
+    }
+
+    .cb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.1s;
+      user-select: none;
+    }
+    .cb-item:hover { background: var(--bg); }
+
+    /* Custom checkbox */
+    .cb-box {
+      width: 15px; height: 15px;
+      border: 1.5px solid var(--cb-border);
+      border-radius: 3.5px;
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 0.12s, background 0.12s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cb-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+    .cb-item input[type="checkbox"]:checked + .cb-box {
+      background: var(--cb-checked);
+      border-color: var(--cb-checked);
+    }
+    .cb-item input[type="checkbox"]:checked + .cb-box::after {
+      content: '';
+      display: block;
+      width: 9px; height: 6px;
+      border-left: 1.5px solid #fff;
+      border-bottom: 1.5px solid #fff;
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+    .cb-label {
+      font-size: 12.5px;
+      color: var(--text-2);
+      line-height: 1.3;
+    }
+    .cb-item:has(input:checked) .cb-label { color: var(--text-1); }
+
+    /* ══════════════════════════════
+       RIGHT PANEL — Column Order
+    ══════════════════════════════ */
+    .panel-order {
+      width: 210px;
+      min-width: 210px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-panel);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-order-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .panel-order-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .order-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+    .order-list::-webkit-scrollbar { width: 4px; }
+    .order-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      cursor: grab;
+      transition: background 0.1s;
+      border-radius: 0;
+    }
+    .order-item:hover { background: var(--bg); }
+    .order-item.dragging {
+      background: var(--primary-light);
+      box-shadow: var(--shadow-panel);
+      border-radius: 8px;
+      opacity: 0.9;
+    }
+    .order-num {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-3);
+      width: 20px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .order-name {
+      font-size: 12.5px;
+      color: var(--text-1);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .order-drag-handle {
+      color: var(--text-3);
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+    .order-item:hover .order-drag-handle { opacity: 1; }
+
+    /* ══════════════════════════════
+       DISABLED CHECKBOXES (default read-only)
+    ══════════════════════════════ */
+    .cb-item:has(input:disabled) {
+      cursor: default;
+      pointer-events: none;
+    }
+    .cb-item:has(input:disabled):hover { background: transparent; }
+
+    /* Unchecked disabled — grey box */
+    .cb-item input[type="checkbox"]:disabled + .cb-box {
+      background: #F3F4F6;
+      border-color: #D1D5DB;
+    }
+    /* Checked disabled — muted grey fill (still shows checkmark) */
+    .cb-item input[type="checkbox"]:disabled:checked + .cb-box {
+      background: #C4C9D4;
+      border-color: #C4C9D4;
+    }
+    /* Muted label text when disabled */
+    .cb-item:has(input:disabled) .cb-label {
+      color: var(--text-3);
+    }
+    .cb-item:has(input:disabled:checked) .cb-label {
+      color: var(--text-2);
+    }
+
+    /* ══════════════════════════════
+       EDIT MODE BADGE
+    ══════════════════════════════ */
+    /* Title group: title text + badge side-by-side */
+    .panel-columns-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .badge-edit-mode {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      background: #EFF6FF;
+      color: #3B82F6;
+      border: 1px solid #BFDBFE;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .badge-edit-mode::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #3B82F6;
+      flex-shrink: 0;
+    }
+    body.edit-mode .badge-edit-mode { display: inline-flex; }
+    body.edit-mode .btn-edit-template { display: none; }
+
+    /* Header actions: Edit Template (default) vs Batal+Simpan (edit mode) */
+    .panel-columns-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn-batal-header, .btn-simpan-header {
+      display: none;
+    }
+    body.edit-mode .btn-batal-header,
+    body.edit-mode .btn-simpan-header { display: inline-flex; align-items: center; }
+
+    /* ══════════════════════════════
+       EDIT MODE — right panel
+    ══════════════════════════════ */
+    .panel-order-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-reset-order {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 0;
+      transition: opacity 0.12s;
+    }
+    .btn-reset-order:hover { opacity: 0.75; }
+    .btn-reset-order svg { width: 13px; height: 13px; flex-shrink: 0; }
+    body.edit-mode .btn-reset-order { display: flex; }
+
+    .btn-batal {
+      padding: 6px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-2);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.12s, color 0.12s;
+    }
+    .btn-batal:hover { border-color: var(--text-2); color: var(--text-1); }
+
+    .btn-simpan {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-simpan:hover { background: var(--primary-hover); }
+
+    /* Always-visible drag handle in edit mode */
+    body.edit-mode .order-drag-handle { opacity: 1; }
+
+    /* ══════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════ */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .panel-templates,
+    .panel-columns,
+    .panel-order {
+      animation: fadeIn 0.3s ease both;
+    }
+    .panel-columns { animation-delay: 0.05s; }
+    .panel-order   { animation-delay: 0.1s; }
+  </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-img">
+      <div class="logo-icon-wrap">
+        <!-- Bisnisaja brand mark — stylized "b" leaf/shield -->
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="13" cy="13" r="13" fill="#E91E8C" opacity="0.12"/>
+          <path d="M8 6.5h5.5C15.43 6.5 17 8.07 17 10a3 3 0 0 1-1.5 2.6A3.2 3.2 0 0 1 17.5 16c0 2.21-1.79 4-4 4H8V6.5z" fill="#E91E8C"/>
+          <circle cx="18" cy="8" r="3.5" fill="#E91E8C"/>
+        </svg>
+      </div>
+      <span class="logo-wordmark">bisnis<span>aja</span></span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Shipments
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Check Rates
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create Shipment
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Address List
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Item List
+    </a>
+
+    <div class="nav-sep"></div>
+
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Waiting for Payment
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payment
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.56"/></svg>
+      Refund
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Billing
+    </a>
+
+    <div class="nav-sep"></div>
+
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Report Setting
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      User Management
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      Client Management
+    </a>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">TA</div>
+      <div class="user-info">
+        <div class="user-name">Tri Adi Ber…</div>
+        <div class="user-email">triadibers@…</div>
+      </div>
+      <svg class="user-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- Page Title Bar -->
+  <div class="page-topbar">
+    <h1 class="page-title">Atur Laporan</h1>
+  </div>
+
+  <!-- Three-panel content -->
+  <div class="content-area">
+
+    <!-- ── LEFT: Template List ── -->
+    <div class="panel-templates">
+      <div class="panel-templates-header">
+        <div class="panel-templates-title">Daftar Template</div>
+        <div class="panel-templates-desc">Gunakan template untuk menyusun laporan pengiriman.</div>
+      </div>
+
+      <div class="template-list" id="template-list">
+        <div class="template-item" data-id="shipment">
+          <span class="template-item-name">Shipment Report</span>
+          <div class="template-item-menu" title="Opsi">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </div>
+        </div>
+        <div class="template-item active" data-id="packing">
+          <span class="template-item-name">Packing and Shipping…</span>
+          <div class="template-item-menu" title="Opsi">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-templates-footer">
+        <button class="btn-add-template">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Template Baru
+        </button>
+        <a class="btn-download-link" href="#">
+          Kunjungi Download Laporan
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── CENTER: Column Selector ── -->
+    <div class="panel-columns">
+      <div class="panel-columns-header">
+        <div class="panel-columns-title-row">
+          <div class="panel-columns-title-group">
+            <span class="panel-columns-title">Packing and Shipping Report</span>
+            <span class="badge-edit-mode">Mode Edit</span>
+          </div>
+          <div class="panel-columns-header-actions">
+            <button class="btn-edit-template" id="btn-edit-template">Edit Template</button>
+            <button class="btn-batal btn-batal-header" id="btn-batal">Batal</button>
+            <button class="btn-simpan btn-simpan-header" id="btn-simpan">Simpan Template</button>
+          </div>
+        </div>
+        <p class="panel-columns-desc">
+          Sesuaikan laporan pengiriman Anda dengan memilih kolom-kolom, lalu geser baris untuk mengatur urutan di file Excel. Download laporan Anda dari halaman Pengiriman.
+        </p>
+      </div>
+
+      <div class="columns-scroll">
+        <div class="data-label">Data Laporan</div>
+
+        <!-- PENGIRIMAN -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Pengiriman</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Tanggal Pesan"><span class="cb-box"></span><span class="cb-label">Tanggal Pesan</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Jenis Pengiriman"><span class="cb-box"></span><span class="cb-label">Jenis Pengiriman</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Tanggal Pick-up"><span class="cb-box"></span><span class="cb-label">Tanggal Pick-up</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Status Pengiriman"><span class="cb-box"></span><span class="cb-label">Status Pengiriman</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Booking ID"><span class="cb-box"></span><span class="cb-label">Booking ID</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Tanggal Update Status"><span class="cb-box"></span><span class="cb-label">Tanggal Update Status</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="AWB"><span class="cb-box"></span><span class="cb-label">AWB</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Diterima Oleh"><span class="cb-box"></span><span class="cb-label">Diterima Oleh</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="External Invoice No."><span class="cb-box"></span><span class="cb-label">External Invoice No.</span></label>
+          </div>
+        </div>
+
+        <!-- PENGIRIM -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Pengirim</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Grup"><span class="cb-box"></span><span class="cb-label">Grup</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Kota (Pengirim)"><span class="cb-box"></span><span class="cb-label">Kota</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Nama Pengirim"><span class="cb-box"></span><span class="cb-label">Nama Pengirim</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Provinsi (Pengirim)"><span class="cb-box"></span><span class="cb-label">Provinsi</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Nomor Telepon Pengirim"><span class="cb-box"></span><span class="cb-label">Nomor Telepon Pengirim</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Kode Pos (Pengirim)"><span class="cb-box"></span><span class="cb-label">Kode Pos</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Alamat Pengirim"><span class="cb-box"></span><span class="cb-label">Alamat</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Catatan Tambahan (Pengirim)"><span class="cb-box"></span><span class="cb-label">Catatan Tambahan</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Kecamatan (Pengirim)"><span class="cb-box"></span><span class="cb-label">Kecamatan</span></label>
+          </div>
+        </div>
+
+        <!-- PENERIMA -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Penerima</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Nama Penerima"><span class="cb-box"></span><span class="cb-label">Nama Penerima</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Kota (Penerima)"><span class="cb-box"></span><span class="cb-label">Kota</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Nomor Telepon Penerima"><span class="cb-box"></span><span class="cb-label">Nomor Telepon</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Provinsi (Penerima)"><span class="cb-box"></span><span class="cb-label">Provinsi</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Alamat Penerima"><span class="cb-box"></span><span class="cb-label">Alamat</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Kode Pos (Penerima)"><span class="cb-box"></span><span class="cb-label">Kode Pos</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Kecamatan (Penerima)"><span class="cb-box"></span><span class="cb-label">Kecamatan</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Catatan Tambahan (Penerima)"><span class="cb-box"></span><span class="cb-label">Catatan Tambahan</span></label>
+          </div>
+        </div>
+
+        <!-- PAKET -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Paket</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Nama Barang"><span class="cb-box"></span><span class="cb-label">Nama Barang</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Dimensi"><span class="cb-box"></span><span class="cb-label">Dimensi</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Jumlah Barang"><span class="cb-box"></span><span class="cb-label">Jumlah Barang</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Total Berat Barang"><span class="cb-box"></span><span class="cb-label">Total Berat Barang</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Total Nilai Barang"><span class="cb-box"></span><span class="cb-label">Total Nilai Barang</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Berat Terhitung"><span class="cb-box"></span><span class="cb-label">Berat Terhitung</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Asuransi"><span class="cb-box"></span><span class="cb-label">Asuransi</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Berat Tambahan"><span class="cb-box"></span><span class="cb-label">Berat Tambahan</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Kategori"><span class="cb-box"></span><span class="cb-label">Kategori</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Total Berat"><span class="cb-box"></span><span class="cb-label">Total Berat</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Pecah Belah"><span class="cb-box"></span><span class="cb-label">Pecah Belah</span></label>
+          </div>
+        </div>
+
+        <!-- LAYANAN -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Layanan</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Layanan Tambahan"><span class="cb-box"></span><span class="cb-label">Layanan Tambahan</span></label>
+          </div>
+        </div>
+
+        <!-- PEMBAYARAN -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Pembayaran</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Total Pembayaran"><span class="cb-box"></span><span class="cb-label">Total Pembayaran</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Biaya Layanan Tambahan"><span class="cb-box"></span><span class="cb-label">Biaya Layanan Tambahan</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Biaya Pengiriman"><span class="cb-box"></span><span class="cb-label">Biaya Pengiriman</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Jumlah COD"><span class="cb-box"></span><span class="cb-label">Jumlah COD</span></label>
+            <label class="cb-item"><input type="checkbox" disabled checked data-col="Biaya Asuransi"><span class="cb-box"></span><span class="cb-label">Biaya Asuransi</span></label>
+            <label class="cb-item"><input type="checkbox" disabled data-col="Tipe Pembayaran"><span class="cb-box"></span><span class="cb-label">Tipe Pembayaran</span></label>
+          </div>
+        </div>
+
+        <!-- LAINNYA -->
+        <div class="checkbox-section">
+          <div class="checkbox-section-label">Lainnya</div>
+          <div class="checkbox-grid">
+            <label class="cb-item"><input type="checkbox" disabled data-col="Tagar"><span class="cb-box"></span><span class="cb-label">Tagar</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Column Order ── -->
+    <div class="panel-order">
+      <div class="panel-order-header">
+        <div class="panel-order-header-row">
+          <div class="panel-order-title">Urutan Kolom</div>
+          <button class="btn-reset-order" id="btn-reset-order">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.56"/></svg>
+            Reset Urutan
+          </button>
+        </div>
+      </div>
+      <ol class="order-list" id="order-list">
+        <!-- Populated by JS -->
+      </ol>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /main -->
+
+<script>
+  // ── All checkboxes in their DOM order (defines the canonical column order)
+  function getAllCbsInDomOrder() {
+    return [...document.querySelectorAll('.checkbox-grid input[type="checkbox"]')];
+  }
+
+  function getAllColsInDomOrder() {
+    return getAllCbsInDomOrder().map(cb => cb.dataset.col);
+  }
+
+  // Checked columns in DOM order (the source of truth for ordering)
+  function getCheckedColsInDomOrder() {
+    return getAllCbsInDomOrder().filter(cb => cb.checked).map(cb => cb.dataset.col);
+  }
+
+  // Display-friendly names (strip parenthetical qualifiers for the order list)
+  function displayName(col) {
+    return col.replace(/ \(.*\)$/, '');
+  }
+
+  // ── Render order list
+  function renderOrderList(columns) {
+    const ol = document.getElementById('order-list');
+    ol.innerHTML = '';
+    columns.forEach((col, i) => {
+      const li = document.createElement('li');
+      li.className = 'order-item';
+      li.draggable = true;
+      li.dataset.col = col;
+      li.innerHTML = `
+        <span class="order-num">${i + 1}.</span>
+        <span class="order-name">${displayName(col)}</span>
+        <svg class="order-drag-handle" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+          <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+          <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+        </svg>`;
+      ol.appendChild(li);
+    });
+    attachDragEvents();
+  }
+
+  // ── Sync order list when a checkbox changes.
+  // Removes unchecked items; inserts newly-checked items at the position
+  // that matches their order in the checkbox grid (DOM order).
+  function syncOrderList() {
+    const allColsInDom = getAllColsInDomOrder();
+    const checkedSet   = new Set(getCheckedColsInDomOrder());
+
+    const ol           = document.getElementById('order-list');
+    const currentOrder = [...ol.querySelectorAll('.order-item')].map(li => li.dataset.col);
+    const currentSet   = new Set(currentOrder);
+
+    // 1. Remove unchecked items, keep the rest in their current (possibly dragged) order
+    const pruned    = currentOrder.filter(c => checkedSet.has(c));
+    const prunedSet = new Set(pruned);
+
+    // 2. Insert newly-checked items at the correct DOM-order position
+    const newItems = allColsInDom.filter(c => checkedSet.has(c) && !prunedSet.has(c));
+    const result   = [...pruned];
+
+    for (const col of newItems) {
+      const colDomIdx = allColsInDom.indexOf(col);
+      let insertAt = result.length; // default: end
+      for (let i = 0; i < result.length; i++) {
+        if (allColsInDom.indexOf(result[i]) > colDomIdx) {
+          insertAt = i;
+          break;
+        }
+      }
+      result.splice(insertAt, 0, col);
+    }
+
+    renderOrderList(result);
+  }
+
+  // ── Checkbox change → sync order list
+  document.querySelectorAll('.checkbox-grid input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', syncOrderList);
+  });
+
+  // ── Drag-to-reorder
+  let dragSrc = null;
+
+  function attachDragEvents() {
+    const items = document.querySelectorAll('.order-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', e => {
+        dragSrc = item;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        dragSrc = null;
+        document.querySelectorAll('.order-item').forEach((li, i) => {
+          li.querySelector('.order-num').textContent = (i + 1) + '.';
+        });
+      });
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (dragSrc && dragSrc !== item) {
+          const ol      = item.parentNode;
+          const allItems = [...ol.children];
+          const srcIdx  = allItems.indexOf(dragSrc);
+          const dstIdx  = allItems.indexOf(item);
+          ol.insertBefore(dragSrc, srcIdx < dstIdx ? item.nextSibling : item);
+        }
+      });
+    });
+  }
+
+  // ── Template switching
+  document.querySelectorAll('.template-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // ══════════════════════════════
+  // EDIT MODE
+  // ══════════════════════════════
+  let editSnapshot = null;
+
+  const btnEditTemplate = document.getElementById('btn-edit-template');
+  const btnBatal        = document.getElementById('btn-batal');
+  const btnSimpan       = document.getElementById('btn-simpan');
+  const btnResetOrder   = document.getElementById('btn-reset-order');
+
+  function getAllCheckboxes() {
+    return getAllCbsInDomOrder();
+  }
+
+  function takeSnapshot() {
+    return {
+      checked: getAllCheckboxes().map(cb => ({ col: cb.dataset.col, checked: cb.checked })),
+      order:   [...document.querySelectorAll('.order-item')].map(li => li.dataset.col)
+    };
+  }
+
+  function enterEditMode() {
+    editSnapshot = takeSnapshot();
+    getAllCheckboxes().forEach(cb => cb.removeAttribute('disabled'));
+    document.body.classList.add('edit-mode');
+  }
+
+  function exitEditMode() {
+    getAllCheckboxes().forEach(cb => cb.setAttribute('disabled', ''));
+    document.body.classList.remove('edit-mode');
+    editSnapshot = null;
+  }
+
+  btnEditTemplate.addEventListener('click', enterEditMode);
+
+  btnBatal.addEventListener('click', () => {
+    if (editSnapshot) {
+      getAllCheckboxes().forEach(cb => {
+        const snap = editSnapshot.checked.find(s => s.col === cb.dataset.col);
+        if (snap) cb.checked = snap.checked;
+      });
+      renderOrderList(editSnapshot.order);
+    }
+    exitEditMode();
+  });
+
+  btnSimpan.addEventListener('click', () => {
+    exitEditMode();
+  });
+
+  // Reset Urutan: rebuild from checkbox DOM order (ignores any drag customisation)
+  btnResetOrder.addEventListener('click', () => {
+    renderOrderList(getCheckedColsInDomOrder());
+  });
+
+  // ── Init: build order from DOM order of initially-checked checkboxes
+  renderOrderList(getCheckedColsInDomOrder());
+</script>
+</body>
+</html>
