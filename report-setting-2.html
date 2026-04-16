@@ -320,9 +320,34 @@
       /* always visible — matches Figma design */
     }
 
-    /* ── Simpan Template — below the card ── */
-    .btn-simpan-below {
+    /* ── Simpan / Batal row — below the card ── */
+    .btn-row-below {
+      display: flex;
+      gap: 8px;
       width: 100%;
+      flex-shrink: 0;
+    }
+    .btn-batal-below {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #D1D5DB;
+      border-radius: 10px;
+      background: #fff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, opacity 0.15s;
+    }
+    .btn-batal-below:not(:disabled):hover { background: #F9FAFB; border-color: #9CA3AF; }
+    .btn-batal-below:disabled {
+      background: #F9FAFB;
+      color: #D1D5DB;
+      border-color: #E5E7EB;
+      cursor: not-allowed;
+    }
+    .btn-simpan-below {
+      flex: 1;
       padding: 10px 14px;
       border: none;
       border-radius: 10px;
@@ -332,7 +357,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: background 0.12s, opacity 0.15s;
-      flex-shrink: 0;
     }
     .btn-simpan-below:not(:disabled):hover { background: var(--primary-hover); }
     .btn-simpan-below:disabled {
@@ -680,8 +704,11 @@
         </ol>
       </div>
 
-      <!-- Simpan Template — outside the card, below it -->
-      <button class="btn-simpan-below" id="btn-simpan" disabled>Simpan Template</button>
+      <!-- Batal + Simpan row — outside the card, below it -->
+      <div class="btn-row-below">
+        <button class="btn-batal-below" id="btn-batal" disabled>Batal</button>
+        <button class="btn-simpan-below" id="btn-simpan" disabled>Simpan Template</button>
+      </div>
     </div>
 
   </div><!-- /content-area -->
@@ -814,7 +841,8 @@
     });
 
     renderOrderList(cfg.order, true); // staggered entrance on template switch
-    btnSimpan.setAttribute('disabled', '');
+    takeSnapshot();
+    markClean();
   }
 
   // ── Diff-based sync: individually animates items in/out
@@ -923,16 +951,46 @@
 
   // ── Simpan Template: save current state into the active template config
   const btnSimpan = document.getElementById('btn-simpan');
+  const btnBatal  = document.getElementById('btn-batal');
+
+  // Snapshot of saved state — restored on Batal
+  let savedSnapshot = null;
+
+  function takeSnapshot() {
+    const cfg = templateConfigs[activeTemplateId];
+    savedSnapshot = {
+      checked: [...cfg.checked],
+      order:   [...cfg.order]
+    };
+  }
 
   function markDirty() {
     btnSimpan.removeAttribute('disabled');
+    btnBatal.removeAttribute('disabled');
   }
+
+  function markClean() {
+    btnSimpan.setAttribute('disabled', '');
+    btnBatal.setAttribute('disabled', '');
+  }
+
+  btnBatal.addEventListener('click', () => {
+    if (!savedSnapshot) return;
+    // Restore checkboxes
+    getAllCbsInDomOrder().forEach(cb => {
+      cb.checked = savedSnapshot.checked.includes(cb.value);
+    });
+    // Restore order list without dirty flag
+    renderOrderList(savedSnapshot.order, true);
+    markClean();
+  });
 
   btnSimpan.addEventListener('click', () => {
     const cfg = templateConfigs[activeTemplateId];
     cfg.checked = getCheckedColsInDomOrder();
     cfg.order   = [...document.querySelectorAll('.order-item')].map(li => li.dataset.col);
-    btnSimpan.setAttribute('disabled', '');
+    takeSnapshot();
+    markClean();
     showToast(`"${cfg.name}" berhasil disimpan!`);
   });
 
