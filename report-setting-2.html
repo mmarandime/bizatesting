@@ -1008,11 +1008,11 @@
 
   btnBatal.addEventListener('click', () => {
     if (!savedSnapshot) return;
-    // Restore checkboxes
+    // Revert checkboxes to last saved state
     getAllCbsInDomOrder().forEach(cb => {
-      cb.checked = savedSnapshot.checked.includes(cb.value);
+      cb.checked = savedSnapshot.checked.includes(cb.dataset.col);
     });
-    // Restore order list without dirty flag
+    // Revert order list to last saved state
     renderOrderList(savedSnapshot.order, true);
     markClean();
   });
