@@ -298,10 +298,26 @@
     }
     .order-item:hover { border-color: #BDBDBD; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
     .order-item.dragging {
+      opacity: 0.42;
+      transform: scale(0.97);
       border-color: var(--primary-border);
       background: var(--primary-lighter);
-      box-shadow: 0 4px 12px rgba(233,30,140,0.12);
-      opacity: 0.92;
+      transition: opacity 0.12s, transform 0.12s;
+    }
+    .order-item.drag-over {
+      border-color: var(--primary);
+      background: #FFF5FB;
+      box-shadow: 0 2px 8px rgba(233,30,140,0.13);
+      transform: scale(1.012);
+      transition: background 0.08s, border-color 0.08s, transform 0.08s, box-shadow 0.08s;
+    }
+    @keyframes orderItemSettle {
+      0%   { transform: scale(1.045); box-shadow: 0 4px 14px rgba(233,30,140,0.18); border-color: var(--primary); }
+      60%  { transform: scale(0.995); }
+      100% { transform: scale(1);     box-shadow: none; border-color: #E0E0E0; }
+    }
+    .order-item-settle {
+      animation: orderItemSettle 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
     .order-num {
       font-size: 13px; font-weight: 400;
@@ -910,11 +926,19 @@
     document.querySelectorAll('.order-item').forEach(item => {
       item.addEventListener('dragstart', e => {
         dragSrc = item;
-        item.classList.add('dragging');
+        // Slight delay so the ghost image captures the normal state first
+        requestAnimationFrame(() => item.classList.add('dragging'));
         e.dataTransfer.effectAllowed = 'move';
       });
       item.addEventListener('dragend', () => {
         item.classList.remove('dragging');
+        // Remove any leftover drag-over highlights
+        document.querySelectorAll('.order-item.drag-over').forEach(li => li.classList.remove('drag-over'));
+        // Settle animation on the dropped item
+        item.classList.remove('order-item-settle');
+        void item.offsetWidth; // force reflow to restart animation
+        item.classList.add('order-item-settle');
+        item.addEventListener('animationend', () => item.classList.remove('order-item-settle'), { once: true });
         dragSrc = null;
         document.querySelectorAll('.order-item').forEach((li, i) => {
           li.querySelector('.order-num').textContent = (i + 1) + '.';
@@ -924,12 +948,20 @@
       item.addEventListener('dragover', e => {
         e.preventDefault();
         if (dragSrc && dragSrc !== item) {
+          // Highlight the current drop target, clear others
+          document.querySelectorAll('.order-item.drag-over').forEach(li => {
+            if (li !== item) li.classList.remove('drag-over');
+          });
+          item.classList.add('drag-over');
           const ol       = item.parentNode;
           const allItems = [...ol.children];
           const srcIdx   = allItems.indexOf(dragSrc);
           const dstIdx   = allItems.indexOf(item);
           ol.insertBefore(dragSrc, srcIdx < dstIdx ? item.nextSibling : item);
         }
+      });
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over');
       });
     });
   }
