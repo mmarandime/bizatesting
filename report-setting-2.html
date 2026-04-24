@@ -139,12 +139,13 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 12px; box-shadow: var(--shadow-panel);
       display: flex; flex-direction: column; overflow: hidden;
+      align-self: flex-start;
     }
     .panel-templates-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--border-light); }
     .panel-templates-title { font-size: 13.5px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
     .panel-templates-desc { font-size: 11.5px; color: var(--text-3); line-height: 1.5; }
 
-    .template-list { padding: 8px 10px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+    .template-list { padding: 8px 10px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
     .template-list::-webkit-scrollbar { width: 4px; }
     .template-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
@@ -449,13 +450,84 @@
     }
 
     /* ══════════════════════════════
+       CONTENT-RIGHT WRAPPER
+    ══════════════════════════════ */
+    .content-right {
+      flex: 1;
+      display: flex;
+      gap: 16px;
+      min-width: 0;
+      position: relative;
+    }
+
+    /* ══════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════ */
+    .empty-state {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #ededed;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .empty-state-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 320px;
+      text-align: center;
+    }
+    .empty-state-illustration {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+    .empty-state-illustration .es-pc {
+      position: absolute;
+      inset: -22% -22.5% -22.5% -22%;
+      width: calc(100% + 44%);
+      height: calc(100% + 44.5%);
+    }
+    .empty-state-illustration .es-icon {
+      position: absolute;
+      top: 25.5%;
+      left: 19%;
+      right: 19%;
+      bottom: 47.8%;
+    }
+    .empty-state-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: #757575;
+    }
+    .empty-state-heading {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 24px;
+      color: #757575;
+    }
+    .empty-state-body {
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #9CA3AF;
+    }
+
+    /* ══════════════════════════════
        ANIMATIONS
     ══════════════════════════════ */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .panel-templates, .panel-columns, .panel-order {
+    .panel-templates, .panel-columns, .panel-order, .empty-state {
       animation: fadeIn 0.3s ease both;
     }
     .panel-columns { animation-delay: 0.05s; }
@@ -574,7 +646,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
           </div>
         </div>
-        <div class="template-item active" data-id="packing">
+        <div class="template-item" data-id="packing">
           <span class="template-item-name">Packing and Shipping…</span>
           <div class="template-item-menu" title="Opsi">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
@@ -593,8 +665,25 @@
       </div>
     </div>
 
-    <!-- ── CENTER: Column Selector ── -->
-    <div class="panel-columns">
+    <!-- ── CENTER + RIGHT wrapper ── -->
+    <div class="content-right">
+
+    <!-- ── EMPTY STATE (shown when no template is selected) ── -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-state-inner">
+        <div class="empty-state-illustration">
+          <img class="es-pc" src="https://www.figma.com/api/mcp/asset/0f19eca7-3625-4360-af3b-c883f504125d" alt="" />
+          <img class="es-icon" src="https://www.figma.com/api/mcp/asset/b5361960-e66f-4e88-98d2-a4c4758d59c2" alt="" />
+        </div>
+        <div class="empty-state-text">
+          <p class="empty-state-heading">Customize Your Report from Template List</p>
+          <p class="empty-state-body">Select a report template from the Template List on the left column. You can customize the shipping report as needed or add new templates.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CENTER: Column Selector (hidden until template selected) ── -->
+    <div class="panel-columns" id="panel-columns" style="display:none;">
       <div class="panel-columns-header">
         <div class="panel-columns-title-row">
           <span class="panel-columns-title" id="template-title">Packing and Shipping Report</span>
@@ -703,8 +792,8 @@
       </div>
     </div>
 
-    <!-- ── RIGHT: Order card + Simpan button ── -->
-    <div class="right-col">
+    <!-- ── RIGHT: Order card + Simpan button (hidden until template selected) ── -->
+    <div class="right-col" id="right-col" style="display:none;">
       <div class="panel-order">
         <div class="panel-order-header">
           <div class="panel-order-header-row">
@@ -726,6 +815,8 @@
         <button class="btn-simpan-below" id="btn-simpan" disabled>Simpan Template</button>
       </div>
     </div>
+
+    </div><!-- /content-right -->
 
   </div><!-- /content-area -->
 </div><!-- /main -->
@@ -789,7 +880,19 @@
     }
   };
 
-  let activeTemplateId = 'packing';
+  let activeTemplateId = null;
+
+  // ── Show/hide empty state vs panels
+  function showEmptyState() {
+    document.getElementById('empty-state').style.display  = 'flex';
+    document.getElementById('panel-columns').style.display = 'none';
+    document.getElementById('right-col').style.display    = 'none';
+  }
+  function showPanels() {
+    document.getElementById('empty-state').style.display  = 'none';
+    document.getElementById('panel-columns').style.display = '';
+    document.getElementById('right-col').style.display    = '';
+  }
 
   // ── All checkboxes in DOM order
   function getAllCbsInDomOrder() {
@@ -848,6 +951,7 @@
     const cfg = templateConfigs[id];
     if (!cfg) return;
     activeTemplateId = id;
+    showPanels();
 
     document.getElementById('template-title').textContent = cfg.name;
 
@@ -1044,8 +1148,8 @@
   }
   toastClose.addEventListener('click', hideToast);
 
-  // ── Init: load the default active template
-  loadTemplate(activeTemplateId);
+  // ── Init: no template selected → show empty state
+  showEmptyState();
 </script>
 </body>
 </html>
